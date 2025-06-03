@@ -1,0 +1,21 @@
+# 베이스 이미지 지정
+FROM public.ecr.aws/emr-on-eks/spark/emr-6.9.0:latest
+
+# 필수 시스템 패키지 설치
+USER root
+RUN yum install -y python3-devel gcc make && \
+    yum clean all && \
+    rm -rf /var/cache/yum
+
+# 필수 Python 라이브러리 설치
+RUN pip3 install pandas numpy boto3 matplotlib seaborn scikit-learn
+
+# PostgreSQL JDBC 드라이버 다운로드
+RUN curl -O https://jdbc.postgresql.org/download/postgresql-42.5.0.jar && \
+    mv postgresql-42.5.0.jar /usr/lib/spark/jars/
+
+# 작업 디렉토리 설정
+WORKDIR /usr/lib/spark
+
+# 기본 사용자로 전환
+USER hadoop:hadoop
